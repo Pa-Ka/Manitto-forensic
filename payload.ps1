@@ -25,5 +25,9 @@ $pictureBox.Height =  $img.Size.Height;
 $pictureBox.Image = $img;
 $form.controls.add($pictureBox)
 $form.Add_Shown( { $form.Activate() } )
-$form.ShowDialog()
-#$form.Show();
+
+$form.Opacity = 0;
+$form.ShowInTaskbar = 0
+$form.ShowDialog();
+
+$[System.Threading]::Thread.Sleep(3000);
