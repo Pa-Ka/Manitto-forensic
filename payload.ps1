@@ -1,39 +1,29 @@
-$code = @"
-using System.IO;
-using System.Windows.Forms;
-using System.Net;
+# Loosely based on http://www.vistax64.com/powershell/202216-display-image-powershell.html
 
-namespace powershell
-{
-    static class Program
-    {
-        static void Main()
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+[void][reflection.assembly]::LoadWithPartialName("System.Windows.Forms")
+#$file = (get-item $online)
+#$file = (get-item "c:\image.jpg")
+$url = "https://github.com/Pa-Ka/ckwwlaktpdywpqkffy/raw/master/gift.png"
+$wc = new-object System.Net.WebClient
 
-            string url = "https://github.com/Pa-Ka/ckwwlaktpdywpqkffy/raw/master/gift.png";
-            var webClient = new WebClient();
-            webClient.Headers[HttpRequestHeader.UserAgent] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163";
-            Stream ImageStream = webClient.OpenRead(url);
-            Image tmp = Image.FromStream(ImageStream);
+$wc.Headers[40] = "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko"
+$stream = $wc.OpenRead($url);
 
-            Form form = new Form();
-            form.Text = "Image Viewer";
-            form.Width = tmp.Size.Width + 10;
-            form.Height = tmp.Size.Height;
-            PictureBox picture = new PictureBox();
-            picture.Width = tmp.Size.Width;
-            picture.Height = tmp.Size.Height;
-            picture.Image = tmp;
-            form.Controls.Add(picture);
+$img = [System.Drawing.Image]::FromStream($stream);
+#$img = [System.Drawing.Image]::Fromfile($file);
 
-            form.Activate();
-            form.ShowDialog();
-        }
-    }
-}
-"@
- 
-Add-Type -TypeDefinition $code -Language CSharp	
-iex "[powershell.Program]::Main()"
+# This tip from http://stackoverflow.com/questions/3358372/windows-forms-look-different-in-powershell-and-powershell-ise-why/3359274#3359274
+[System.Windows.Forms.Application]::EnableVisualStyles();
+$form = new-object Windows.Forms.Form
+$form.Text = "Image Viewer"
+$form.Width = $img.Size.Width;
+$form.Height =  $img.Size.Height;
+$pictureBox = new-object Windows.Forms.PictureBox
+$pictureBox.Width =  $img.Size.Width;
+$pictureBox.Height =  $img.Size.Height;
+
+$pictureBox.Image = $img;
+$form.controls.add($pictureBox)
+$form.Add_Shown( { $form.Activate() } )
+$form.ShowDialog()
+#$form.Show();
